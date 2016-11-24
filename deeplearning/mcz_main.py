@@ -18,7 +18,7 @@ print LOGDIR
 
 flags = tf.app.flags
 FLAGS = flags.FLAGS
-flags.DEFINE_string('train', '/home/ken-kaiho/images/learning/lout.txt', 'File name of train data')
+flags.DEFINE_string('train', '/home/bizadmin/setouchi/input_rz.txt', 'File name of train data')
 flags.DEFINE_string('test', 'test2.txt', 'File name of train data')
 flags.DEFINE_string('train_dir', LOGDIR, 'Directory to put the training data.')
 flags.DEFINE_integer('max_steps', 1000, 'Number of steps to run trainer.')
@@ -35,23 +35,34 @@ def main(ckpt = None):
         train_op = mcz_model.training(loss_value, FLAGS.learning_rate)
         acc = mcz_model.accuracy(logits, labels)
 
+        print 'model difinition' 
+    
+
         saver = tf.train.Saver(max_to_keep = 0)
         sess = tf.Session()
         sess.run(tf.initialize_all_variables())
+
+        print 'tf init'    
+ 
         if ckpt:
             print 'restore ckpt', ckpt
             saver.restore(sess, ckpt)
         tf.train.start_queue_runners(sess)
 
+        print 'tf queue'
+
         summary_op = tf.merge_all_summaries()
         summary_writer = tf.train.SummaryWriter(FLAGS.train_dir, sess.graph_def)
+
+        print 'tf merge'
 
         for step in range(FLAGS.max_steps):
             start_time = time.time()
             _, loss_result, acc_res = sess.run([train_op, loss_value, acc], feed_dict={keep_prob: 0.99})
             duration = time.time() - start_time
  
-            print ' count = %s' % (step)
+            
+            print ' count = %s duration=%s ' % (step,duration)
 
             if step % 10 == 0:
                 num_examples_per_step = FLAGS.batch_size
@@ -65,7 +76,7 @@ def main(ckpt = None):
                 summary_str = sess.run(summary_op,feed_dict={keep_prob: 1.0})
                 summary_writer.add_summary(summary_str, step)
 
-            if step % 1000 == 0 or (step + 1) == FLAGS.max_steps or loss_result == 0:
+            if step % 500 == 0 or (step + 1) == FLAGS.max_steps or loss_result == 0:
                 checkpoint_path = os.path.join(FLAGS.train_dir, 'model.ckpt')
                 saver.save(sess, checkpoint_path, global_step=step)
 

@@ -21,7 +21,7 @@ def evaluation(imgpath, ckpt_path):
     image = tf.reshape(image, [-1, mcz_input.DST_INPUT_SIZE * mcz_input.DST_INPUT_SIZE * 3])
     print image
 
-    logits = mcz_model.inference_deep(image, 1.0, mcz_input.DST_INPUT_SIZE, mcz_input.NUM_CLASS)
+    logits = mcz_model.inference(image, 1.0, mcz_input.DST_INPUT_SIZE, mcz_input.NUM_CLASS)
 
     sess = tf.InteractiveSession()
     saver = tf.train.Saver()
@@ -50,21 +50,20 @@ def evaluation(imgpath, ckpt_path):
 
     return (rank, pred)
 
-def execute(imgpaths, img_root_dir, ckpt_path):
+def execute(imgpath, ckpt_path):
     res = []
-    for imgpath in imgpaths:
-        (rank, pred) = evaluation(img_root_dir + '/' + imgpath, ckpt_path)
-        res.append({
-            'file': imgpath,
-            'top_member_id': pred,
-            'rank': rank
-        })
+    (rank, pred) = evaluation( imgpath, ckpt_path)
+    res.append({
+        'file': imgpath,
+        'top_member_id': pred,
+        'rank': rank
+    })
     return res
 
 if __name__ == '__main__':
     ckpt_path = sys.argv[1]
     imgfile1 = sys.argv[2]
-    imgfile2 = sys.argv[3]
+    #imgfile2 = sys.argv[3]
     #main([imgfile], ckpt_path)
     #main2(imgfile1, ckpt_path)
-    print execute([imgfile1,imgfile2], '.', ckpt_path)
+    print execute(imgfile1, ckpt_path)

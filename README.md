@@ -1,1 +1,2 @@
 # setouchi
+瀬戸内の美しさの概念をDeepLearningによって獲得するプロジェクト
